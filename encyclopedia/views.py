@@ -14,17 +14,73 @@ def convert(request, title ):
     
     if content == None:
         return render(request, 'encyclopedia/error.html', {
-         'error': "La entrada no existe."
+         'mensaje': "La entrada no existe."
         })
-
-
+        
     else:
         html_convert = markdown2.markdown(content)
         
         return render(request, 'encyclopedia/entry.html',
         {
             'title':title,
-            'html_convert':html_convert,
-                          
+            'html_convert':html_convert,             
         })
 
+def search(request):
+    if request.method == "POST":
+        
+        search  = request.POST['q']
+    
+        content = util.get_entry(search)
+        
+        if content is not None :
+            html = markdown2.markdown(content)
+            return render(request , "encyclopedia/entry.html",{
+                "title" : search,
+                "html_search":html,
+            })
+        else:
+            all_entry = util.list_entries()
+            recomendation = []
+            for entry in all_entry:
+                if search.lower() in entry.lower():
+                    recomendation.append(entry)
+            return render(request,"encyclopedia/search.html",{
+                'recomendation': recomendation
+                })
+
+def new_page(request):
+    if request.method == "GET":
+        return render(request,"encyclopedia/new_page.html")
+    else:
+        title = request.POST['title']
+        content = request.POST['content']
+
+        title_exist = util.get_entry(title)
+
+        
+        
+        if title_exist is not None:
+            return render(request, "encyclopedia/error.html",{
+                'mensaje':"Esta pagina ya existe."
+                })
+        else:
+            header_title = f"# {title}"
+            pass_mk = header_title + content
+             
+            util.save_entry(title,pass_mk)
+           
+            content = util.get_entry(title)
+            if content == None:
+                return render(request, 'encyclopedia/error.html', {
+                'mensaje': "Fallo tecnico."
+                })
+                
+            else:
+                html_convert = markdown2.markdown(content)
+                
+                return render(request, 'encyclopedia/entry.html',
+                {
+                    'title':title,
+                    'html_convert':html_convert,             
+                })

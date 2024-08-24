@@ -7,19 +7,22 @@
         <title>{% block title %}{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'encyclopedia/styles.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="https://upload.wikimedia.org/wikipedia/commons/d/de/Wikipedia_Logo_1.0.png" type="image/x-icon">
     </head>
     <body>
         <div class="row">
             <div class="sidebar col-lg-2 col-md-3">
                 <h2><a class="logo-wiki__title" href="/">Wiki</a></h2>
-                <form>
-                    <input class="search" type="text" name="q" placeholder="Search Encyclopedia">
+                <form action="{% url 'search' %}" method="POST">
+                    {% csrf_token %}
+                    <input class="search" type="text" name="q" placeholder="Search Encyclopedia">        
                 </form>
+                
                 <div>
                     <a href="{% url 'index' %}">Home</a>
                 </div>
                 <div>
-                    Create New Page
+                    <a href="{% url 'new_page' %}">Create New Page</a>
                 </div>
                 <div>
                     Random Page
