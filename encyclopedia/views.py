@@ -9,22 +9,20 @@ def index(request):
     })
     
 def convert(request, title ):
-    
     content = util.get_entry(title)
     
-    if content == None:
+    if content is None:
         return render(request, 'encyclopedia/error.html', {
          'mensaje': "La entrada no existe."
         })
         
-    else:
-        html_convert = markdown2.markdown(content)
+    html_convert = markdown2.markdown(content)
         
-        return render(request, 'encyclopedia/entry.html',
-        {
-            'title':title,
-            'html_convert':html_convert,             
-        })
+    return render(request, 'encyclopedia/entry.html',
+    {
+        'title':title,
+        'html_convert':html_convert,             
+    })
 
 def search(request):
     if request.method == "POST":
@@ -35,19 +33,20 @@ def search(request):
         
         if content is not None :
             html = markdown2.markdown(content)
-            return render(request , "encyclopedia/entry.html",{
+            return render(request , "encyclopedia/entry.html",
+            {
                 "title" : search,
                 "html_search":html,
             })
         else:
             all_entry = util.list_entries()
-            recomendation = []
-            for entry in all_entry:
-                if search.lower() in entry.lower():
-                    recomendation.append(entry)
-            return render(request,"encyclopedia/search.html",{
+            
+            recomendation = [entry for entry in all_entry if search.lower() in entry.lower()]
+
+            return render(request,"encyclopedia/search.html",
+            {
                 'recomendation': recomendation
-                })
+            })
 
 def new_page(request):
     if request.method == "GET":
@@ -64,10 +63,9 @@ def new_page(request):
                 'mensaje':"Esta pagina ya existe."
                 })
         else:
-            header_title = f"#{title}"
-            pass_mk = header_title + content
+            content_page = f"#{title}" + "\n" + content
              
-            util.save_entry(title,pass_mk)
+            util.save_entry(title,content_page)
            
             content = util.get_entry(title)
             if content == None:
@@ -99,11 +97,13 @@ def save(request):
         title = request.POST['title']
         content = request.POST['content']
 
-        util.save_entry(title,content)
+        content_page = f"#{title}" + "\n" + content
+
+        util.save_entry(title,content_page)
         
         content = util.get_entry(title)
         
-        if content == None:
+        if content is None:
             
             return render(request, 'encyclopedia/error.html', {
                 'mensaje': "Fallo tecnico."
